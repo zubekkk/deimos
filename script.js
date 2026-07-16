@@ -12,7 +12,6 @@ const serverIp = document.getElementById('server-ip');
 const serverPreset = document.getElementById('server-preset');
 
 const PROXIES = [
-    url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
     url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
     url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
 ];
