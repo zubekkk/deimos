@@ -11,36 +11,47 @@ const serverMap = document.getElementById('server-map');
 const serverIp = document.getElementById('server-ip');
 const serverPreset = document.getElementById('server-preset');
 
+const PROXIES = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+    url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+
+async function fetchWithFallback(apiUrl) {
+    for (const makeProxy of PROXIES) {
+        try {
+            const proxyUrl = makeProxy(apiUrl);
+            const response = await fetch(proxyUrl, { method: 'GET' });
+
+            if (!response.ok)
+                continue;
+
+            const data = await response.json();
+
+            const raw = data.contents ?? data;
+            return typeof raw === 'string' ? JSON.parse(raw) : raw;
+        } catch {
+            continue;
+        }
+    }
+    throw new Error('Все прокси недоступны');
+}
+
 async function fetchServerStatus() {
-  try {
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(API_URL)}`;
-    const response = await fetch(proxyUrl, {
-      method: 'GET'
-    });
+    try {
+        const serverData = await fetchWithFallback(API_URL);
 
-    if (!response.ok)
-      throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-
-    if (!data.contents)
-      throw new Error('Нет полученной информации от прокси');
-
-    const serverData = JSON.parse(data.contents);
-
-    // Обновляем интерфейс
-    playersCount.textContent = `${serverData.players} из ${serverData.soft_max_players}` || '—';
-    serverRound.textContent = serverData.round_id || '—';
-    serverMap.textContent = serverData.map || '—';
-    serverPreset.textContent = serverData.preset || '—';
-    serverIp.textContent = SERVER_IP;
-    serverStatus.textContent = 'Онлайн';
-    serverStatus.style.color = '#03da39';
-
-  } catch (error) {
-    console.error('Ошибка запроса:', error);
-    updateOfflineState();
-  }
+        playersCount.textContent = `${serverData.players} из ${serverData.soft_max_players}`;
+        serverRound.textContent = serverData.round_id || '—';
+        serverMap.textContent = serverData.map || '—';
+        serverPreset.textContent = serverData.preset || '—';
+        serverIp.textContent = SERVER_IP;
+        serverStatus.textContent = 'Онлайн';
+        serverStatus.style.color = '#03da39';
+    } catch (error) {
+        console.error('Ошибка запроса:', error);
+        updateOfflineState();
+    }
 }
 
 function updateOfflineState() {
