@@ -1,7 +1,7 @@
 // API FETCH-Start
 const SERVER_IP = '185.97.255.17:1216'; // Deimos
 const API_URL = `http://${SERVER_IP}/status`;
-const REFRESH_INTERVAL = 20000;
+const REFRESH_INTERVAL = 5000;
 
 // Элементы
 const playersCount = document.getElementById('players-current');
