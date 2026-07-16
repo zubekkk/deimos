@@ -1,5 +1,5 @@
 // API FETCH-Start
-const SERVER_IP = '185.97.255.17:1216'; // Deimos
+const SERVER_IP = '185.97.255.17:1213'; // Deimos
 const API_URL = `http://${SERVER_IP}/status`;
 const REFRESH_INTERVAL = 5000;
 
